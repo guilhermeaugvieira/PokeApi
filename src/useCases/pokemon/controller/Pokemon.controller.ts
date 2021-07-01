@@ -21,13 +21,13 @@ export class PokemonController {
     const _pokeApi = container.resolve(PokeApiUseCase);
     const dadosPokeApi = await _pokeApi.execute(id);
 
-    if(!dadosPokeApi) {      
+    if(dadosPokeApi !== null) {      
       try {
         // Recebe os dados do pokemon
         const _pokemon = container.resolve(PokemonsUseCase);
         dadosPokemon = await _pokemon.execute(dadosPokeApi);
 
-        if(!dadosPokemon){
+        if(dadosPokemon !== undefined){
           const _abilities = container.resolve(AbilitiesUseCase);
           await _abilities.execute(dadosPokeApi, dadosPokemon);
 
@@ -56,7 +56,7 @@ export class PokemonController {
         throw error;
       }
     }else{
-      responseMessage = `Pokemon ${dadosPokemon.id} não encontrado`;
+      responseMessage = `Pokemon ${id} não encontrado`;
     }
 
     return resposta.json(responseMessage);
