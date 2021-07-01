@@ -18,7 +18,6 @@ export class SpritesUseCase implements ISprites {
     registroSprites.id = registroPokemon;
 
     const countSprites = await getRepository(Sprites).count({where: {id: registroSprites.id}});
-
     if(countSprites === 0) await getRepository(Sprites).save(registroSprites);
   }
 }

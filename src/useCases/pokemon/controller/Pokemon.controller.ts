@@ -16,18 +16,18 @@ export class PokemonController {
   ler = async (requisicao: Request, resposta: Response): Promise<Response> => {
     const id = +requisicao.params.id;
     let dadosPokemon: Pokemons;
+    let responseMessage;
 
     const _pokeApi = container.resolve(PokeApiUseCase);
     const dadosPokeApi = await _pokeApi.execute(id);
 
-    if(dadosPokeApi !== null) {
-      
+    if(!dadosPokeApi) {      
       try {
         // Recebe os dados do pokemon
         const _pokemon = container.resolve(PokemonsUseCase);
         dadosPokemon = await _pokemon.execute(dadosPokeApi);
 
-        if(dadosPokemon !== null){
+        if(!dadosPokemon){
           const _abilities = container.resolve(AbilitiesUseCase);
           await _abilities.execute(dadosPokeApi, dadosPokemon);
 
@@ -48,12 +48,17 @@ export class PokemonController {
           
           const _pokemonTypes = container.resolve(PokemonTypesUseCase);
           await _pokemonTypes.execute(dadosPokeApi, dadosPokemon);
+
+          responseMessage = `Pokemon ${dadosPokemon.id}: ${dadosPokemon.name} incluído`;
         }
       } catch (error) {
+        responseMessage = `Erro ao inserir o pokemon ${dadosPokemon.id}: ${dadosPokemon.name}`
         throw error;
       }
+    }else{
+      responseMessage = `Pokemon ${dadosPokemon.id} não encontrado`;
     }
 
-    return resposta.json(`Pokemon ${dadosPokemon.id}: ${dadosPokemon.name} incluído`);
+    return resposta.json(responseMessage);
   }
 }

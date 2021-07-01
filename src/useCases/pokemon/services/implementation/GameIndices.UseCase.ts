@@ -13,16 +13,16 @@ export class GameIndicesUseCase implements IGameIndices {
       registroVersion.id = +gameIndex.version.url.split("/")[6];
       registroVersion.name = gameIndex.version.name;
 
-      const countVersion = await getRepository(Versions).count({where: {id: registroVersion.id}})
-      
+      const countVersion = await getRepository(Versions).count({where: {id: registroVersion.id}});   
       if(countVersion === 0) await getRepository(Versions).save(registroVersion);
 
       const registroGameIndices = new GameIndices();
       registroGameIndices.gameIndex = gameIndex.game_index;
       registroGameIndices.pokemon = registroPokemon;
       registroGameIndices.version = registroVersion;
-      
-      await getRepository(GameIndices).save(registroGameIndices);
+
+      const countGameIndices = await getRepository(GameIndices).count({where: {pokemon: registroPokemon, version: registroVersion}});      
+      if(countGameIndices === 0) await getRepository(GameIndices).save(registroGameIndices);
     };
   }
 }

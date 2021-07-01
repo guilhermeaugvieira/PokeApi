@@ -18,10 +18,8 @@ export class PokemonsUseCase implements IPokemon {
     registroPokemon.weight = resultPokeApi.weight;
 
     const countPokemons = await getRepository(Pokemons).count({where: {id: registroPokemon.id}});
-
-    if(countPokemons === 0){
-      resultInsert = await getRepository(Pokemons).save(registroPokemon);
-    }
+    if(countPokemons === 0) resultInsert = await getRepository(Pokemons).save(registroPokemon);
+    else resultInsert = await getRepository(Pokemons).findOne({where: {id: registroPokemon.id}});
 
     return resultInsert;
   }

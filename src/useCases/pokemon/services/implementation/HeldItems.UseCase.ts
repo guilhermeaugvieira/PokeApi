@@ -14,45 +14,33 @@ export class HeldItemsUseCase implements IHeldItems {
       registroPokemonItem.id = +heldItem.item.url.split('/')[6];
       registroPokemonItem.name = heldItem.item.name;
 
-      const countPokemonItem = await getRepository(PokemonItems).count({where: {id: registroPokemonItem.id}})
-
+      const countPokemonItem = await getRepository(PokemonItems).count({where: {id: registroPokemonItem.id}});
       if(countPokemonItem === 0) await getRepository(PokemonItems).save(registroPokemonItem);
 
       const registroHeldItem = new HeldItems();
       registroHeldItem.pokemon = registroPokemon;
       registroHeldItem.pokemonItem = registroPokemonItem;
-      
-      const saveHeldItem = await getRepository(HeldItems).save(registroHeldItem);
+
+      let saveHeldItem: HeldItems;
+      const countHeldItem = await getRepository(HeldItems).count({where: {pokemon: registroPokemon, pokemonItem: registroPokemonItem}});
+      if(countHeldItem === 0) saveHeldItem = await getRepository(HeldItems).save(registroHeldItem);
+      else saveHeldItem = await getRepository(HeldItems).findOne({where: {pokemon: registroPokemonItem, pokemonItem: registroPokemonItem}});     
 
       for(const vd_result of heldItem.version_details){    
         const registroVersion = new Versions();
         registroVersion.id = +vd_result.version.url.split('/')[6];
         registroVersion.name = vd_result.version.name;
 
-        const countVersion = await getRepository(Versions).count({where: {id: registroVersion.id}});
-        
-        if(countVersion === 0){
-          await getRepository(Versions).save(registroVersion);
+        const countVersion = await getRepository(Versions).count({where: {id: registroVersion.id}});        
+        if(countVersion === 0) await getRepository(Versions).save(registroVersion);
 
-          const registroVersionDetails = new VersionDetails();
-          registroVersionDetails.rarity = vd_result.rarity;
-          registroVersionDetails.version = registroVersion;
-          registroVersionDetails.heldItem = saveHeldItem;
+        const registroVersionDetails = new VersionDetails();
+        registroVersionDetails.rarity = vd_result.rarity;
+        registroVersionDetails.version = registroVersion;
+        registroVersionDetails.heldItem = saveHeldItem;
 
-          const countVersionDetails = await getRepository(VersionDetails).count({where: {heldItem: registroVersionDetails.heldItem, version: registroVersionDetails.version}});
-
-          if(countVersionDetails === 0) await getRepository(VersionDetails).save(registroVersionDetails); 
-        }
-        else{
-          const registroVersionDetails = new VersionDetails();
-          registroVersionDetails.rarity = vd_result.rarity;
-          registroVersionDetails.version = registroVersion;
-          registroVersionDetails.heldItem = saveHeldItem;
-
-          const countVersionDetails = await getRepository(VersionDetails).count({where: {heldItem: registroVersionDetails.heldItem, version: registroVersionDetails.version}});
-
-          if (countVersionDetails === 0) await getRepository(VersionDetails).save(registroVersionDetails);
-        }
+        const countVersionDetails = await getRepository(VersionDetails).count({where: {heldItem: registroVersionDetails.heldItem, version: registroVersionDetails.version}});
+        if (countVersionDetails === 0) await getRepository(VersionDetails).save(registroVersionDetails);
       }
     }
   }

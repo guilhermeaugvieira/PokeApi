@@ -14,7 +14,6 @@ export class StatsUseCase implements IStats {
       registroStatsItem.name = statsSelected.stat.name;
 
       const countStatItems = await getRepository(StatsItems).count({where: {id: registroStatsItem.id}});
-
       if(countStatItems === 0) await getRepository(StatsItems).save(registroStatsItem);
 
       const registroStats = new Stats();
@@ -24,7 +23,6 @@ export class StatsUseCase implements IStats {
       registroStats.pokemon = registroPokemon;
 
       const countStats = await getRepository(Stats).count({where: {pokemon: registroStats.pokemon, statsItem: registroStats.statsItem}});
-
       if(countStats === 0) await getRepository(Stats).save(registroStats);
     }
   }
