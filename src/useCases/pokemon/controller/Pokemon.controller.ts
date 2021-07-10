@@ -16,7 +16,7 @@ export class PokemonController {
   ler = async (requisicao: Request, resposta: Response): Promise<Response> => {
     const id = +requisicao.params.id;
     let dadosPokemon: Pokemons;
-    let responseMessage;
+    let mensagemResposta;
     
     try {
       const _pokeApi = container.resolve(PokeApiUseCase);
@@ -47,13 +47,13 @@ export class PokemonController {
       const _pokemonTypes = container.resolve(PokemonTypesUseCase);
       await _pokemonTypes.execute(dadosPokeApi, dadosPokemon);
 
-      responseMessage = `Pokemon ${dadosPokemon.id}: ${dadosPokemon.name} incluído`;
+      mensagemResposta = `Pokemon ${dadosPokemon.id}: ${dadosPokemon.name} incluído`;
     }catch (error) {
-      if(error.response.status === 404) responseMessage = `Pokemon ${id} não cadastrado na PokeAPI`;
-      else responseMessage = `Erro ao inserir o pokemon ${id}`;
       console.log(error);
+      if(error.response.status === 404) mensagemResposta = `Pokemon ${id} não cadastrado na PokeAPI`;
+      else mensagemResposta = `Erro ao inserir o pokemon ${id}`;
     }
 
-    return resposta.json(responseMessage);
+    return resposta.json(mensagemResposta);
   }
 }
