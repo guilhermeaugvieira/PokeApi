@@ -8,7 +8,7 @@ const controladorPokemon = new PokemonController();
 
 rotasPokemon.post("/:id", celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.number().required().min(1).max(898),
+    id: Joi.number().required().min(1),
   }),
 }), controladorPokemon.ler);
 
